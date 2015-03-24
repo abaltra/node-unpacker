@@ -1,13 +1,31 @@
 {
-  "name": "node-inflator",
-  "preferGlobal": true,
-  "version": "0.0.1",
-  "author": "Alejandro Baltra <abaltra@gmail.com>",
-  "description": "Simple compressed file inflator",
-  "license": "MIT",
-  "engines": {
-    "node": ">=0.10"
+  "name": "node-unpacker",
+  "version": "0.1.0",
+  "description": "Simple unpacker for node",
+  "main": "inflator.js",
+  "directories": {
+    "test": "test"
   },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abaltra/node-unpacker.git"
+  },
+  "keywords": [
+    "node",
+    "zip",
+    "rar",
+    "tar",
+    "unpack"
+  ],
+  "author": "Alejandro Baltra <abaltra@gmail.com> (http://www.abaltra.info)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/abaltra/node-unpacker/issues"
+  },
+  "homepage": "https://github.com/abaltra/node-unpacker",
   "dependencies": {
     "async": "^0.9.0",
     "chai": "^2.1.2",
@@ -20,7 +38,7 @@
     "unrar": "^0.1.2",
     "unzip": "^0.1.11"
   },
-  "scripts": {
-    "test": "NODE_ENV=test mocha"
+  "engines": {
+    "node": ">=0.10"
   }
 }
