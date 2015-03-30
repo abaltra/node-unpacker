@@ -1,4 +1,3 @@
-var AdmZip = require('adm-zip');
 var unzip = require('unzip');
 var fs = require('fs');
 var uuid = require('node-uuid');
@@ -6,10 +5,10 @@ var unrar = require('unrar');
 var tarball = require('tarball-extract');
 var async = require('async');
 var Q = require('q');
+var zlib = require('zlib');
 
 function extractZip (path, outpath, create_random_path, q) {
     try {
-        var zip = new AdmZip(path);
         fs.exists(outpath, function (exists) {
             if (exists) {
                 outpath = create_random_path? outpath + uuid.v4() + '/' : outpath;
@@ -27,7 +26,7 @@ function extractZip (path, outpath, create_random_path, q) {
     } catch (err) {
         return q.reject(err);
     }
-}
+};
 
 function extractTarGZ (path, outpath, create_random_path, q) {
     fs.exists(outpath, function (exists) {
@@ -50,7 +49,36 @@ function extractTarGZ (path, outpath, create_random_path, q) {
             q.reject('Output path doesn\'t exist');
         }
     });
-}
+};
+
+function extractGZ (path, outpath, create_random_path, q) {
+    var pieces = path.split('/');
+    var out = pieces[pieces.length - 1].slice(0, pieces[pieces.length - 1].length - 3); // Single files with regular extension prior to .gz
+    
+    fs.exists(outpath, function (exists) {
+        if (exists) {
+            var uid = uuid.v4();
+            outpath = create_random_path ? outpath + uid + '/' : outpath;
+            if (create_random_path) {
+                fs.mkdirSync(outpath);
+            }
+            fs.createReadStream(path)
+                .pipe(zlib.createGzip()
+                    .on('error', function (e) {
+                        q.reject(e);
+                    }))
+                .pipe(fs.createWriteStream(outpath + out)
+                    .on('finish', function (e) {
+                        q.resolve(outpath);
+                    })
+                    .on('error', function (e) {
+                        q.reject(e);
+                    }));
+        } else {
+            q.reject('Output path doesn\'t exist');
+        }
+    });
+};
 
 function extractRar (path, outpath, create_random_path, q) {
     fs.exists(outpath, function (exists) {
@@ -119,10 +147,10 @@ function extractRar (path, outpath, create_random_path, q) {
                 });
             });
         } else {
-            q.reject('Output path doesn\'t exist')
+            q.reject('Output path doesn\'t exist');
         }
     });
-}
+};
 
 exports.unpackFile = function (path, outpath, create_random_path) {
     var deferred = Q.defer();
@@ -144,8 +172,10 @@ exports.unpackFile = function (path, outpath, create_random_path) {
                     })
                 },
                 function (cb) {
-                    if( /(tar|gz|tgz)$/i.test(path)) {
+                    if( /(tar|tar\.gz|tgz)$/i.test(path)) {
                         extractTarGZ(path, outpath, create_random_path, deferred);
+                    } else if (/(gz)$/i.test(path)) {
+                        extractGZ(path, outpath, create_random_path, deferred);
                     } else if (/(zip)$/i.test(path)) {
                         extractZip(path, outpath, create_random_path, deferred);
                     } else if (/(rar)$/i.test(path)) {
@@ -163,4 +193,4 @@ exports.unpackFile = function (path, outpath, create_random_path) {
     }
 
     return deferred.promise;
-}
+};

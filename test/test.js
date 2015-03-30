@@ -214,6 +214,20 @@ describe('Working unpacks', function () {
             function (err) {});
     });
 
+    it('Inflate GZ file', function (done) {
+        return inflator.unpackFile('test/files/gzed.png.gz', 'test/inflated/', true).then(
+            function (data) {
+                expect(data).to.exist;
+                fs.readdir(data, function (err, files) {
+                    expect(files.length).to.equal(1);
+                    expect(files[0]).to.equal('gzed.png');
+                    done();
+                });
+            },
+            function (err) {}
+        );
+    });
+
     it('Unpack TAR file', function (done) {
         return inflator.unpackFile('test/files/tared_files.tar', 'test/inflated/', true).then(
             function (data) {
