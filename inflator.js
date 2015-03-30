@@ -158,8 +158,3 @@ exports.unpackFile = function (path, outpath, create_random_path) {
 
     return deferred.promise;
 }
-
-exports.test_func = function (param) {
-    if (param) return;
-    else throw "ERROR"
-}
