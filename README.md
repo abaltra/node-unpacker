@@ -25,4 +25,5 @@
   Feel free to contribute, let's just try to keep it readable :)
 
 ## Release History
+  * 0.2.0 Changed Zip management, added error management
   * 0.1.0 Initial release
