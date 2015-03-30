@@ -1,4 +1,5 @@
 var AdmZip = require('adm-zip');
+var unzip = require('unzip');
 var fs = require('fs');
 var uuid = require('node-uuid');
 var unrar = require('unrar');
@@ -12,8 +13,13 @@ function extractZip (path, outpath, create_random_path, q) {
         fs.exists(outpath, function (exists) {
             if (exists) {
                 outpath = create_random_path? outpath + uuid.v4() + '/' : outpath;
-                zip.extractAllTo(outpath);
-                q.resolve(outpath);
+                fs.createReadStream(path).pipe(unzip.Extract({ path: outpath })
+                    .on('close', function (e) {
+                        q.resolve(outpath);
+                    })
+                    .on('error', function (e) {
+                        q.reject(e);
+                    }));
             } else {
                 q.reject('Output path doesn\'t exist');
             }
