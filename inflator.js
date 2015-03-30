@@ -1,4 +1,4 @@
-var unzip = require('unzip');
+var AdmZip = require('adm-zip');
 var fs = require('fs');
 var uuid = require('node-uuid');
 var unrar = require('unrar');
@@ -7,21 +7,20 @@ var async = require('async');
 var Q = require('q');
 
 function extractZip (path, outpath, create_random_path, q) {
-    fs.exists(outpath, function (exists) {
-        if (exists) {
-            outpath = create_random_path? outpath + uuid.v4() + '/' : outpath;
-            try {
-                fs.createReadStream(path).pipe(unzip.Extract({ path: outpath }).on('close', function () {
-                    q.resolve(outpath);
-                }));
-            } catch (err) {
-                return q.reject(err);
+    try {
+        var zip = new AdmZip(path);
+        fs.exists(outpath, function (exists) {
+            if (exists) {
+                outpath = create_random_path? outpath + uuid.v4() + '/' : outpath;
+                zip.extractAllTo(outpath);
+                q.resolve(outpath);
+            } else {
+                q.reject('Output path doesn\'t exist');
             }
-
-        } else {
-            q.reject('Output path doesn\'t exist');
-        }
-    }) 
+        });
+    } catch (err) {
+        return q.reject(err);
+    }
 }
 
 function extractTarGZ (path, outpath, create_random_path, q) {
@@ -32,10 +31,14 @@ function extractTarGZ (path, outpath, create_random_path, q) {
             if (create_random_path) {
                 fs.mkdirSync(outpath);
             }
-            tarball.extractTarball(path, outpath, function (err) {
-                if (err) return q.reject(err);
-                return q.resolve(outpath);    
-            });
+            try {
+                tarball.extractTarball(path, outpath, function (err) {
+                    if (err) return q.reject(err);
+                    return q.resolve(outpath);    
+                });
+            } catch (err) {
+                q.reject(err);
+            }
 
         } else {
             q.reject('Output path doesn\'t exist');

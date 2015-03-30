@@ -57,7 +57,7 @@ describe('Failed unpacks', function () {
             });
     });
 
-/*
+
     it('should fail on corrupted ZIP file', function () {
         return inflator.unpackFile('test/files/corrupted.zip', 'test/inflated', true).then(
             function (data) {},
@@ -65,7 +65,7 @@ describe('Failed unpacks', function () {
                 expect(err).to.exist;
             });
     });
-*/
+
 
     it('should fail on corrupted RAR file', function () {
         return inflator.unpackFile('test/files/corrupted.rar', 'test/inflated', true).then(
@@ -74,25 +74,22 @@ describe('Failed unpacks', function () {
                 expect(err).to.exist;
             });
     });
-/*  
+  
     it('should fail on corrupted TAR.GZ file', function () {
         return inflator.unpackFile('test/files/corrupted.tar.gz', 'test/inflated', true).then(
             function (data) {},
             function (err) {
                 expect(err).to.exist;
-                console.log(err);
             });
-    })
+    });
 
     it('should fail on corrupted TAR file', function () {
         return inflator.unpackFile('test/files/corrupted.tar', 'test/inflated', true).then(
             function (data) {},
             function (err) {
                 expect(err).to.exist;
-                console.log(err);
             });
-    })
-*/   
+    })  
 });
 
 describe('Working unpacks', function () {
