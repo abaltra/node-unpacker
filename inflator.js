@@ -6,6 +6,31 @@ var tarball = require('tarball-extract');
 var async = require('async');
 var Q = require('q');
 var zlib = require('zlib');
+var p7zip = require('node-7z');
+
+function extract7Zip (path, outpath, create_random_path, q) {
+    fs.exists(outpath, function (exists) {
+        if (exists) {
+            outpath = create_random_path? outpath + uuid.v4() + '/' : outpath;
+            var expander = new p7zip();
+            expander.test(path)
+                .then(function () {
+                    expander.extractFull(path, outpath)
+                        .then(function () {
+                            q.resolve(outpath);
+                        })
+                        .catch(function (e) {
+                            q.reject(e);
+                        });
+                })
+                .catch(function (e) {
+                    q.reject(e);
+                });
+        } else {
+            q.reject('Output path doesn\'t exist');
+        }
+    });
+};
 
 function extractZip (path, outpath, create_random_path, q) {
     try {
@@ -180,6 +205,8 @@ exports.unpackFile = function (path, outpath, create_random_path) {
                         extractZip(path, outpath, create_random_path, deferred);
                     } else if (/(rar)$/i.test(path)) {
                         extractRar(path, outpath, create_random_path, deferred);
+                    } else if (/(7z|zipx)$/i.test(path)) {
+                        extract7Zip(path, outpath, create_random_path, deferred);
                     } else {
                         return cb('File type not supported')
                     }
