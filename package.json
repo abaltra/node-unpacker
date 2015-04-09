@@ -1,6 +1,6 @@
 {
   "name": "node-unpacker",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Simple unpacker for node",
   "main": "inflator.js",
   "directories": {
@@ -18,6 +18,8 @@
     "zip",
     "rar",
     "tar",
+    "7zip",
+    "xzip",
     "unpack"
   ],
   "author": "Alejandro Baltra <abaltra@gmail.com> (http://www.abaltra.info)",
