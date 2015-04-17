@@ -33,24 +33,7 @@ function extract7Zip (path, outpath, create_random_path, q) {
 };
 
 function extractZip (path, outpath, create_random_path, q) {
-    try {
-        fs.exists(outpath, function (exists) {
-            if (exists) {
-                outpath = create_random_path? outpath + uuid.v4() + '/' : outpath;
-                fs.createReadStream(path).pipe(unzip.Extract({ path: outpath })
-                    .on('close', function (e) {
-                        q.resolve(outpath);
-                    })
-                    .on('error', function (e) {
-                        q.reject(e);
-                    }));
-            } else {
-                q.reject('Output path doesn\'t exist');
-            }
-        });
-    } catch (err) {
-        return q.reject(err);
-    }
+    extract7Zip(path, outpath, createReadStream, q);
 };
 
 function extractTarGZ (path, outpath, create_random_path, q) {
@@ -202,7 +185,7 @@ exports.unpackFile = function (path, outpath, create_random_path) {
                     } else if (/(gz)$/i.test(path)) {
                         extractGZ(path, outpath, create_random_path, deferred);
                     } else if (/(zip)$/i.test(path)) {
-                        extractZip(path, outpath, create_random_path, deferred);
+                        extract7Zip(path, outpath, create_random_path, deferred);
                     } else if (/(rar)$/i.test(path)) {
                         extractRar(path, outpath, create_random_path, deferred);
                     } else if (/(7z|zipx)$/i.test(path)) {

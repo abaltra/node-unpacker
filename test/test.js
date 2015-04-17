@@ -106,8 +106,76 @@ describe('Working unpacks', function () {
         });
     });
 
+    it('Unpack MACOSX packed ZIP file', function (done) {
+        return inflator.unpackFile('test/files/zip-small.zip', 'test/inflated/', true).then(
+            function (data) {
+                expect(data).to.exist;
+
+                fs.readdir(data, function (err, files) {
+                    expect(files.length).to.equal(6);
+                    done();
+                });
+            },
+            function (err) {}   
+        );
+    });
+
     it('Unpack ZIP file', function (done) {
         return inflator.unpackFile('test/files/zipped_files.zip', 'test/inflated/', true).then(
+            function (data) {
+                expect(data).to.exist;
+
+                async.waterfall([
+                    function (callback) {
+                        fs.readdir(data, function (err, files) {
+                            expect(files.length).to.equal(1);
+                            callback(null, files[0]);
+                        })
+                    },
+                    function (file, callback) {
+                        fs.stat(data + '/' + file, function (err, stats) {
+                            expect(stats.isDirectory()).to.equal(true);
+                            callback(null, data + file);
+                        });
+                    },
+                    function (path, callback) {
+                        fs.readdir(path, function (err, files) {
+                            expect(files.length).to.equal(5);
+                            callback(null, files, path);
+                        })
+                    },
+                    function (files, path, callback) {
+                        var dirs = [];
+                        var _files = [];
+
+                        async.eachSeries(files, 
+                            function (file, cb) {
+                                fs.stat(path + '/' + file, function (error, stat) {
+                                    if (stat.isDirectory()) dirs.push(path + '/' + file);
+                                    else _files.push(path + '/' + file);
+                                    cb();
+                                });
+                            }, function (err) {
+                                expect(dirs.length).to.equal(1);
+                                expect(_files.length).to.equal(4);
+                                callback(null, dirs[0]);
+                            })
+                    },
+                    function (dir, callback) {
+                        fs.readdir(dir, function (err, files) {
+                            expect(files.length).to.equal(1);
+                            callback();
+                        });
+                    }], function (err, results){
+                        done();
+                    }
+                );       
+            },
+            function (err) {});
+    });
+
+    it('Unpack 7Z file', function (done) {
+        return inflator.unpackFile('test/files/7zipped.7z', 'test/inflated/', true).then(
             function (data) {
                 expect(data).to.exist;
 
