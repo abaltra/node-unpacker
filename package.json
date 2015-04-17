@@ -1,6 +1,6 @@
 {
   "name": "node-unpacker",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Simple unpacker for node",
   "main": "inflator.js",
   "directories": {
