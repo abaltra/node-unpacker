@@ -1,4 +1,3 @@
-var unzip = require('unzip');
 var fs = require('fs');
 var uuid = require('node-uuid');
 var unrar = require('unrar');
