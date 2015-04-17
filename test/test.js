@@ -174,6 +174,20 @@ describe('Working unpacks', function () {
             function (err) {});
     });
 
+    it('Unpack ZIPX file', function (done) {
+        this.timeout(30000);
+        return inflator.unpackFile('test/files/zipx_files.zipx', 'test/inflated/', true).then(
+            function (data) {
+                expect(data).to.exist;
+
+                fs.readdir(data, function (err, files) {
+                    expect(files.length).to.equal(2);
+                    done();
+                });
+            },
+            function (err) {});
+    });
+
     it('Unpack 7Z file', function (done) {
         return inflator.unpackFile('test/files/7zipped.7z', 'test/inflated/', true).then(
             function (data) {
