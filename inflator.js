@@ -99,60 +99,61 @@ function extractRar (path, outpath, create_random_path, q) {
             var archive = null;
             try {
                 archive = new unrar(path);
+            
+                if (create_random_path) {
+                    fs.mkdirSync(outpath);
+                }
+                archive.list(function (err, entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.type === 'Directory') {
+                            var path_pieces = entry.name.split('/');
+                            var saved_pieces = path_pieces[0];
+                            saved_routes[saved_pieces] = true;
+                            dirs.push(saved_pieces);
+                            for (var i = 1; i < path_pieces.length; i++) {
+                                saved_pieces += ('/' + path_pieces[i]);
+                                if (saved_routes[saved_pieces]) continue;
+                                else {
+                                    saved_routes[saved_pieces] = true;
+                                    dirs.push(saved_pieces);
+                                }
+                            }
+                        } else {
+                            files.push(entry);
+                        }
+                    });
+                    dirs.sort(function (a, b) {
+                        return a.split('/').length - b.split('/').length;
+                    });
+
+                    async.eachSeries(dirs, function (direntry, cb) {
+                        fs.mkdir(outpath + direntry, function (err) {
+                            cb(err);
+                        });
+                    }, function (err) {
+                        if (err) {
+                            return q.reject(err);
+                        }
+                        async.each(files, function (fileentry, cb) {
+                            var stream = archive.stream(fileentry.name);
+                            try {
+                                stream.pipe(fs.createWriteStream(outpath + fileentry.name))
+                                cb();
+                            } catch (err) {
+                                cb(err);
+                            }
+                        }, function (err) {
+                            if (err) {
+                                q.reject(err);
+                            } else {
+                                q.resolve(outpath);
+                            }
+                        });
+                    });
+                });
             } catch (err) {
                 return q.reject(err);
             }
-            if (create_random_path) {
-                fs.mkdirSync(outpath);
-            }
-            archive.list(function (err, entries) {
-                entries.forEach(function (entry) {
-                    if (entry.type === 'Directory') {
-                        var path_pieces = entry.name.split('/');
-                        var saved_pieces = path_pieces[0];
-                        saved_routes[saved_pieces] = true;
-                        dirs.push(saved_pieces);
-                        for (var i = 1; i < path_pieces.length; i++) {
-                            saved_pieces += ('/' + path_pieces[i]);
-                            if (saved_routes[saved_pieces]) continue;
-                            else {
-                                saved_routes[saved_pieces] = true;
-                                dirs.push(saved_pieces);
-                            }
-                        }
-                    } else {
-                        files.push(entry);
-                    }
-                });
-                dirs.sort(function (a, b) {
-                    return a.split('/').length - b.split('/').length;
-                });
-
-                async.eachSeries(dirs, function (direntry, cb) {
-                    fs.mkdir(outpath + direntry, function (err) {
-                        cb(err);
-                    });
-                }, function (err) {
-                    if (err) {
-                        return q.reject(err);
-                    }
-                    async.each(files, function (fileentry, cb) {
-                        var stream = archive.stream(fileentry.name);
-                        try {
-                            stream.pipe(fs.createWriteStream(outpath + fileentry.name))
-                            cb();
-                        } catch (err) {
-                            cb(err);
-                        }
-                    }, function (err) {
-                        if (err) {
-                            q.reject(err);
-                        } else {
-                            q.resolve(outpath);
-                        }
-                    });
-                });
-            });
         } else {
             q.reject('Output path doesn\'t exist');
         }
