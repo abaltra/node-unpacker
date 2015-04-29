@@ -104,6 +104,9 @@ function extractRar (path, outpath, create_random_path, q) {
                     fs.mkdirSync(outpath);
                 }
                 archive.list(function (err, entries) {
+                    if (err) {
+                        return q.reject(err);
+                    }
                     entries.forEach(function (entry) {
                         if (entry.type === 'Directory') {
                             var path_pieces = entry.name.split('/');
