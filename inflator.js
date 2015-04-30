@@ -31,10 +31,6 @@ function extract7Zip (path, outpath, create_random_path, q) {
     });
 };
 
-function extractZip (path, outpath, create_random_path, q) {
-    extract7Zip(path, outpath, createReadStream, q);
-};
-
 function extractTarGZ (path, outpath, create_random_path, q) {
     fs.exists(outpath, function (exists) {
         if (exists) {
@@ -174,13 +170,13 @@ exports.unpackFile = function (path, outpath, create_random_path) {
                     fs.exists(path, function (exists) {
                         if (exists) return cb();
                         else return cb('Input file not found');
-                    })
+                    });
                 }, 
                 function (cb) {
                     fs.access(outpath, fs.R_OK | fs.W_OK, function (err) {
                         if (err) return cb('Cannot write in output folder');
                         return cb();
-                    })
+                    });
                 },
                 function (cb) {
                     if( /(tar|tar\.gz|tgz)$/i.test(path)) {
