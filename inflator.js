@@ -12,7 +12,7 @@ function extract7Zip (path, outpath, create_random_path, q) {
         if (exists) {
             outpath = create_random_path? outpath + uuid.v4() + '/' : outpath;
             var expander = new p7zip();
-            expander.test(path)
+            expander.test(path, {p: 'NONE'})
                 .then(function () {
                     expander.extractFull(path, outpath)
                         .then(function () {
@@ -23,6 +23,7 @@ function extract7Zip (path, outpath, create_random_path, q) {
                         });
                 })
                 .catch(function (e) {
+                    if (!e) e = new Error('Unknown error.');
                     q.reject(e);
                 });
         } else {
@@ -94,7 +95,10 @@ function extractRar (path, outpath, create_random_path, q) {
             var files = [];
             var archive = null;
             try {
-                archive = new unrar(path);
+                archive = new unrar({
+                    path: path,
+                    arguments: ['-pNONE']
+                });
             
                 if (create_random_path) {
                     fs.mkdirSync(outpath);
