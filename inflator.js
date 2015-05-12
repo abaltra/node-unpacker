@@ -97,7 +97,8 @@ function extractRar (path, outpath, create_random_path, q) {
             try {
                 archive = new unrar({
                     path: path,
-                    arguments: ['-pNONE']
+                    arguments: ['-pNONE'],
+                    failOnPasswords: true
                 });
             
                 if (create_random_path) {

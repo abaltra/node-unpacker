@@ -89,7 +89,23 @@ describe('Failed unpacks', function () {
             function (err) {
                 expect(err).to.exist;
             });
-    })  
+    })
+
+    it('should fail on password protected ZIP file', function () {
+        return inflator.unpackFile('test/files/zipped_password.zip', 'test/inflated', true).then(
+            function (data) {},
+            function (err) {
+                expect(err).to.exist;
+            });
+    });
+
+    it('should fail on password protected RAR file', function () {
+        return inflator.unpackFile('test/files/rared_pass_files.rar', 'test/inflated', true).then(
+            function (data) {},
+            function (err) {
+                expect(err).to.exist;
+            });
+    })
 });
 
 describe('Working unpacks', function () {
