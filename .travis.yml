@@ -1,3 +1,12 @@
 language: node_js
+sudo: true
 node_js:
-  - node
+- '0.12'
+branches:
+  only:
+  - /^.*master$/
+before_install:
+- npm install npm@next -g
+- sudo apt-get update -qq
+- sudo apt-get install -y p7zip-full
+- sudo apt-get install -y unrar
