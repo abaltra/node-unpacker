@@ -1,8 +1,17 @@
-# node-unpacker
-  Simple unpacker for node that wraps UNZIP, UNTAR and UNRAR
+node-unpacker
+=============
+[![Build Status](https://travis-ci.org/abaltra/node-unpacker.svg?branch=master)](https://travis-ci.org/abaltra/node-unpacker)
+
+> Simple unpacker for node that wraps UNZIP, UNTAR and UNRAR
 
 ## Installation
+You must have the `7za` executable in your path or in the same directory as you `package.json`. Remember, `7zip`   requires the `rar` plugin to be installed to manage RAR files.
+
+```
+  sudo apt-get install -y 7zip-full 7zip-rar
   npm install node-unpacker --save
+```
+  
   
 ## Usage
   ```
