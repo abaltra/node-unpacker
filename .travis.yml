@@ -9,4 +9,4 @@ before_install:
 - npm install npm@next -g
 - sudo apt-get update -qq
 - sudo apt-get install -y p7zip-full
-- sudo apt-get install -y unrar
+- sudo apt-get install -y unrar-nonfree
