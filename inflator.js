@@ -66,7 +66,7 @@ function extractGZ (path, outpath, create_random_path, q) {
                 fs.mkdirSync(outpath);
             }
             fs.createReadStream(path)
-                .pipe(zlib.createGzip()
+                .pipe(zlib.createGunzip()
                     .on('error', function (e) {
                         q.reject(e);
                     }))
